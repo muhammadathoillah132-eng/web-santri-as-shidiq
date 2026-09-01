@@ -35,6 +35,12 @@ Aplikasi web untuk Manajemen Data & Administrasi Santri Pondok Pesantren As Shid
 - Frontend: Login, Layout (emerald sidebar + gold accent + Islamic motif), Dashboard (8 cards + 3 charts), Santri (table+filter+CRUD modal+import/export), SantriDetail (7 tabs), Pembayaran (with invoice-link picker), Tagihan (massal), Laporan (charts+filters), MasterData (7 tabs), ManajemenAdmin, Aktivitas, Pengaturan, Global search (Cmd+K).
 - Testing: 28/28 backend pytest PASSED; all frontend routes verified with session cookie. RBAC gates verified (admin 403 on super_admin routes). Kwitansi PDF & xlsx exports return 200.
 
+## Deployment — GitHub Pages (2026-09-01)
+- Workflow: `.github/workflows/deploy-pages.yml` — build `frontend/` (craco/CRA → output `build/`, bukan dist), PUBLIC_URL=/web-santri-as-shidiq, SPA fallback 404.html, deploy via actions/deploy-pages.
+- Router/Auth subpath support: `BrowserRouter basename={process.env.PUBLIC_URL}` (App.js), redirect OAuth + replaceState pakai PUBLIC_URL (Login.jsx, AuthCallback.jsx). Preview Emergent tetap di root (PUBLIC_URL kosong).
+- Syarat user: repo Settings → Pages → Source = GitHub Actions; tambahkan Actions Variable `REACT_APP_BACKEND_URL=https://shidiq-admin-panel.preview.emergentagent.com`; push branch main.
+- Verifikasi lokal: build sukses (37s), semua asset di-serve benar di bawah /web-santri-as-shidiq/ (index, js, css, favicon, 404.html → 200). Backend tetap di Emergent (API dipanggil lintas origin, CORS sudah `*`).
+
 ## Backlog / Next Tasks
 - **P1**: Upload foto santri (object storage); per-filter export (CSV/PDF) on Santri page; Dokumen tab upload; idempotency guard on seed bootstrap.
 - **P1**: Reset-password / admin credential flows if non-OAuth admins added later.
