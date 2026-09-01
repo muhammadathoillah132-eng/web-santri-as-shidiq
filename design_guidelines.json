@@ -1,0 +1,192 @@
+{
+  "project_name": "AS SHIDIQ SANTRI MANAGEMENT",
+  "identity_and_branding": {
+    "organization": "Pondok Pesantren As Shidiq",
+    "app_type": "dashboard / saas_app (Admin Panel)",
+    "aesthetic_archetype": "Hijau Islami Elegan (Emerald Green & Gold Luxury)",
+    "emotional_tone": "Refined, spiritual, authoritative, modern, administrative precision",
+    "context": "Administrative & Financial Management System for Islamic Boarding School (Pondok Pesantren)"
+  },
+  "typography": {
+    "font_family_heading": "Plus Jakarta Sans, Outfit, sans-serif",
+    "font_family_body": "Plus Jakarta Sans, Inter, sans-serif",
+    "font_family_arabic_accent": "Amiri, Traditional Arabic, serif",
+    "font_family_mono": "JetBrains Mono, Source Code Pro, monospace",
+    "google_fonts_embed_url": "https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap",
+    "scale_and_hierarchy": {
+      "h1_page_title": "text-2xl sm:text-3xl font-bold tracking-tight text-emerald-950 dark:text-emerald-50",
+      "h2_section_heading": "text-xl sm:text-2xl font-semibold tracking-tight text-emerald-900 dark:text-emerald-100",
+      "h3_card_heading": "text-base sm:text-lg font-semibold text-emerald-900 dark:text-emerald-200",
+      "h4_subheading": "text-sm sm:text-base font-medium text-slate-700 dark:text-slate-300",
+      "body_text": "text-sm leading-relaxed text-slate-600 dark:text-slate-300",
+      "small_label": "text-xs font-semibold uppercase tracking-wider text-emerald-700/80 dark:text-amber-400/90"
+    }
+  },
+  "colors": {
+    "theme_mode": "Light mode default with dark mode toggle capabilities",
+    "palette": {
+      "emerald_primary_dark": "#064E3B",
+      "emerald_primary": "#047857",
+      "emerald_primary_light": "#10B981",
+      "emerald_accent_bg": "#ECFDF5",
+      "gold_accent_dark": "#B45309",
+      "gold_accent": "#D97706",
+      "gold_accent_light": "#FBBF24",
+      "gold_amber_soft": "#FEF3C7",
+      "slate_bg_main": "#F8FAFC",
+      "slate_bg_surface": "#FFFFFF",
+      "slate_border": "#E2E8F0",
+      "dark_bg_main": "#061A14",
+      "dark_bg_surface": "#0B2920",
+      "dark_border": "#134E3A"
+    },
+    "css_variables": {
+      ":root": {
+        "--background": "150 25% 98%",
+        "--foreground": "160 50% 10%",
+        "--card": "0 0% 100%",
+        "--card-foreground": "160 50% 12%",
+        "--popover": "0 0% 100%",
+        "--popover-foreground": "160 50% 12%",
+        "--primary": "160 84% 24%",
+        "--primary-foreground": "150 30% 98%",
+        "--secondary": "38 92% 50%",
+        "--secondary-foreground": "160 50% 10%",
+        "--muted": "150 15% 94%",
+        "--muted-foreground": "160 20% 40%",
+        "--accent": "38 92% 95%",
+        "--accent-foreground": "38 80% 25%",
+        "--destructive": "0 84% 60%",
+        "--destructive-foreground": "0 0% 98%",
+        "--border": "150 20% 88%",
+        "--input": "150 20% 88%",
+        "--ring": "160 84% 24%",
+        "--radius": "0.625rem",
+        "--chart-1": "160 84% 24%",
+        "--chart-2": "38 92% 50%",
+        "--chart-3": "173 58% 39%",
+        "--chart-4": "197 37% 24%",
+        "--chart-5": "43 74% 66%"
+      },
+      ".dark": {
+        "--background": "160 50% 5%",
+        "--foreground": "150 20% 95%",
+        "--card": "160 45% 8%",
+        "--card-foreground": "150 20% 95%",
+        "--popover": "160 45% 8%",
+        "--popover-foreground": "150 20% 95%",
+        "--primary": "158 64% 42%",
+        "--primary-foreground": "160 50% 5%",
+        "--secondary": "38 85% 53%",
+        "--secondary-foreground": "160 50% 5%",
+        "--muted": "160 30% 15%",
+        "--muted-foreground": "150 15% 65%",
+        "--accent": "160 30% 15%",
+        "--accent-foreground": "150 20% 95%",
+        "--border": "160 30% 18%",
+        "--input": "160 30% 18%",
+        "--ring": "158 64% 42%"
+      }
+    }
+  },
+  "layout_and_navigation": {
+    "structure": "Sidebar + Header Bar + Main Scrollable Content Area",
+    "sidebar": {
+      "width": "w-64 md:w-72",
+      "style": "bg-gradient-to-b from-emerald-950 via-emerald-900 to-emerald-950 text-white shadow-xl border-r border-emerald-800/50",
+      "brand_header": "Pesantren As Shidiq Logo + Arabic Motif accent with Gold Badge",
+      "nav_links": [
+        {"name": "Dashboard", "icon": "LayoutDashboard", "path": "/"},
+        {"name": "Data Santri", "icon": "Users", "path": "/santri"},
+        {"name": "Pembayaran", "icon": "CreditCard", "path": "/pembayaran"},
+        {"name": "Tagihan", "icon": "Receipt", "path": "/tagihan"},
+        {"name": "Laporan", "icon": "BarChart3", "path": "/laporan"},
+        {"name": "Master Data", "icon": "Database", "path": "/master-data"},
+        {"name": "Manajemen Admin", "icon": "ShieldCheck", "path": "/admin"},
+        {"name": "Aktivitas Log", "icon": "History", "path": "/aktivitas"},
+        {"name": "Pengaturan", "icon": "Settings", "path": "/pengaturan"}
+      ]
+    },
+    "header": {
+      "style": "sticky top-0 z-30 bg-white/80 dark:bg-emerald-950/80 backdrop-blur-md border-b border-emerald-100 dark:border-emerald-800/40 px-6 py-3 flex items-center justify-between",
+      "search": "Global Quick Search modal / bar (Cmd+K) with instant filter across Santri, Tagihan, Kwitansi, Master Data",
+      "user_badge": "Super Admin / Admin profile dropdown, Google Auth Avatar indicator, Dark mode toggle, Quick action menu"
+    }
+  },
+  "visual_enhancers": {
+    "islamic_patterns": "Subtle gold & green geometric borders, star polyhedra accents in card headers, gold decorative dividers",
+    "glassmorphism": "backdrop-blur-md bg-white/90 dark:bg-emerald-900/60 border border-emerald-100/80 dark:border-emerald-700/30",
+    "cards": "Rounded-xl border border-slate-200/80 dark:border-emerald-800/50 shadow-sm hover:shadow-md transition-shadow duration-200 bg-white dark:bg-emerald-950/40",
+    "buttons": {
+      "primary": "bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-800 hover:to-emerald-700 text-white shadow-sm shadow-emerald-900/10 rounded-lg font-medium px-4 py-2 transition-all duration-150 active:scale-[0.98]",
+      "gold_accent": "bg-amber-500 hover:bg-amber-600 text-emerald-950 font-semibold shadow-sm rounded-lg px-4 py-2 transition-all duration-150",
+      "outline": "border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-900/50 rounded-lg px-4 py-2"
+    }
+  },
+  "key_features_implementation": {
+    "dashboard": {
+      "stats_cards": [
+        {"title": "Total Santri", "badge": "Aktif & Alumni", "icon": "Users", "accent": "emerald"},
+        {"title": "Santri Putra / Putri", "badge": "Rasio Gender", "icon": "UserCheck", "accent": "blue"},
+        {"title": "Pembayaran Bulan Ini", "badge": "Target SPP", "icon": "Wallet", "accent": "amber"},
+        {"title": "Tagihan Belum Lunas", "badge": "Tunggakan", "icon": "AlertCircle", "accent": "rose"}
+      ],
+      "charts": "Recharts showing Monthly Revenue Breakdown, Gender Distribution, and Sensus Santri Statistics by Program/Kelas"
+    },
+    "santri_management": {
+      "crud_features": "Add, Edit, View Detail, Sensus Data, Upload Foto, Filter by Status/Kelas/Program/Asrama/Gender",
+      "tabbed_detail": ["Profil Santri", "Data Pendidikan", "Orang Tua / Wali", "Kamar & Asrama", "Riwayat Pembayaran", "Aktivitas & Catatan", "Dokumen & Berkas"]
+    },
+    "pembayaran_and_tagihan": {
+      "methods": ["Cash (Tunai)", "Transfer Bank", "QRIS"],
+      "statuses": ["Lunas", "Belum Lunas", "Cicilan"],
+      "tagihan_batch": "Generate Tagihan Massal per Kelas, Program, atau Individu",
+      "kwitansi_pdf": "Interactive printable receipt with official Pesantren As Shidiq Header & QR verification code"
+    },
+    "master_data": ["Program Studi/Tahfidz", "Kelas", "Jurusan", "Tahun Ajaran", "Jenis Pembayaran (SPP, Uang Makan, Gedung)", "Asrama", "Kamar"],
+    "export_import": "Excel & PDF report exports for Financial Reports & Santri Directory"
+  },
+  "media_assets": {
+    "image_urls": [
+      {
+        "category": "Santri Education Activity",
+        "description": "Santri reading books together in class",
+        "url": "https://images.unsplash.com/photo-1629273229664-11fabc0becc0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHwzfHxJc2xhbWljJTIwc2Nob29sJTIwc3R1ZGVudCUyMGVkdWNhdGlvbiUyMHN0dWR5fGVufDB8fHx8MTc4ODI2NTExNXww&ixlib=rb-4.1.0&q=85"
+      },
+      {
+        "category": "Islamic Architecture Accent",
+        "description": "Intricate emerald and gold Islamic ceiling decoration",
+        "url": "https://images.unsplash.com/photo-1624140930663-c6075007b7fd?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MDZ8MHwxfHNlYXJjaHwzfHxJc2xhbWljJTIwYXJjaGl0ZWN0dXJlJTIwbW9zcXVlJTIwZ3JlZW4lMjBlbWVyYWxkJTIwZ29sZCUyMHBhdHRlcm58ZW58MHx8fHwxNzg4MjY1MTE1fDA&ixlib=rb-4.1.0&q=85"
+      },
+      {
+        "category": "Santri Group",
+        "description": "Young students in Islamic school environment",
+        "url": "https://images.unsplash.com/photo-1643429096345-9de0d2ab7e7c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHwyfHxJc2xhbWljJTIwc2Nob29sJTIwc3R1ZGVudCUyMGVkdWNhdGlvbiUyMHN0dWR5fGVufDB8fHx8MTc4ODI2NTExNXww&ixlib=rb-4.1.0&q=85"
+      }
+    ]
+  },
+  "testing_and_accessibility": {
+    "data_testid_rule": "ALL interactive components, buttons, inputs, tabs, modal controls, table actions, and stat widgets MUST contain explicit data-testid attributes in kebab-case format.",
+    "sample_testids": [
+      "sidebar-nav-dashboard",
+      "sidebar-nav-santri",
+      "sidebar-nav-pembayaran",
+      "global-search-input",
+      "add-santri-button",
+      "filter-status-select",
+      "santri-table-row-1",
+      "santri-detail-tab-profil",
+      "santri-detail-tab-pembayaran",
+      "generate-kwitansi-pdf-button",
+      "tagihan-massal-submit-button"
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Build a complete, responsive, full-featured React single-page application for AS SHIDIQ SANTRI MANAGEMENT with mock backend persistence using SWR/Axios or React state so all CRUD, filtering, batch operations, search, and PDF generation work seamlessly.",
+    "Include emergent-based Google login on the Auth page with smooth transition to the Admin Dashboard.",
+    "Maintain the rich Emerald Green (#047857) + Gold/Amber (#D97706) aesthetic with Islamic geometric touches throughout.",
+    "Use Lucide-react icons for clear, crisp administrative navigation.",
+    "Provide modal popups for adding/editing santri, recording payments, creating batch bills, and viewing printable receipts.",
+    "Ensure all interactive elements have data-testid attributes as required."
+  ]
+}

@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+body {
+    margin: 0;
+    font-family: 'Plus Jakarta Sans', 'Outfit', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: #F8FAFC;
+    color: #0F172A;
+}
+
+.font-arabic { font-family: 'Amiri', 'Traditional Arabic', serif; }
+.font-display { font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; }
+
+@layer base {
+    :root {
+        --background: 150 25% 98%;
+        --foreground: 160 50% 10%;
+        --card: 0 0% 100%;
+        --card-foreground: 160 50% 12%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 160 50% 12%;
+        --primary: 160 84% 24%;
+        --primary-foreground: 150 30% 98%;
+        --secondary: 38 92% 50%;
+        --secondary-foreground: 160 50% 10%;
+        --muted: 150 15% 94%;
+        --muted-foreground: 160 20% 40%;
+        --accent: 38 92% 95%;
+        --accent-foreground: 38 80% 25%;
+        --destructive: 0 84% 60%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 150 20% 88%;
+        --input: 150 20% 88%;
+        --ring: 160 84% 24%;
+        --radius: 0.625rem;
+        --chart-1: 160 84% 24%;
+        --chart-2: 38 92% 50%;
+        --chart-3: 173 58% 39%;
+        --chart-4: 197 37% 24%;
+        --chart-5: 43 74% 66%;
+    }
+    * { @apply border-border; }
+    body { @apply bg-background text-foreground; }
+}
+
+/* Recharts initial-render sizing guard */
+.recharts-wrapper { min-height: 200px; }
+
+/* Islamic pattern subtle border */
+.islamic-divider {
+    background-image: linear-gradient(90deg, transparent, #D97706 20%, #047857 50%, #D97706 80%, transparent);
+    height: 2px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #047857; border-radius: 4px; opacity: 0.4; }
+::-webkit-scrollbar-thumb:hover { background: #065F46; }
