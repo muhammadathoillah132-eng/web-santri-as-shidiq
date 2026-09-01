@@ -175,9 +175,7 @@ function BrandHeader({ onClose }) {
   return (
     <div className="p-5 border-b border-emerald-800/40 relative">
       <div className="flex items-center gap-3">
-        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-900/30">
-          <Moon size={22} strokeWidth={2.5} className="text-emerald-950" />
-        </div>
+        <img src="/assets/logo.png" alt="Logo Ponpes As Shidiq" className="w-12 h-12 object-contain drop-shadow-lg" />
         <div>
           <div className="text-[10px] uppercase tracking-widest text-amber-300 font-bold">Pondok Pesantren</div>
           <div className="text-base font-bold leading-tight">AS SHIDIQ</div>

@@ -496,11 +496,14 @@ async def kwitansi_pdf(pid: str, user=Depends(get_current_user)):
     c.rect(0, H - 2.5 * cm, W, 2.5 * cm, fill=1, stroke=0)
     c.setFillColor(gold)
     c.rect(0, H - 2.7 * cm, W, 0.2 * cm, fill=1, stroke=0)
+    logo_path = Path(__file__).parent / "assets" / "logo.png"
+    if logo_path.exists():
+        c.drawImage(str(logo_path), 1 * cm, H - 2.35 * cm, width=1.9 * cm, height=1.9 * cm, mask="auto")
     c.setFillColor(colors.white)
-    c.setFont("Helvetica-Bold", 14)
-    c.drawString(1 * cm, H - 1.3 * cm, "PONDOK PESANTREN AS SHIDIQ")
+    c.setFont("Helvetica-Bold", 13)
+    c.drawString(3.1 * cm, H - 1.3 * cm, "PONDOK PESANTREN AS SHIDIQ")
     c.setFont("Helvetica", 9)
-    c.drawString(1 * cm, H - 1.8 * cm, "Sistem Manajemen Santri — Kwitansi Pembayaran")
+    c.drawString(3.1 * cm, H - 1.8 * cm, "Sistem Manajemen Santri — Kwitansi Pembayaran")
     c.setFont("Helvetica-Bold", 11)
     c.setFillColor(gold)
     c.drawRightString(W - 1 * cm, H - 1.3 * cm, "KWITANSI RESMI")

@@ -22,10 +22,8 @@ export default function Login() {
         <div className="absolute inset-0 opacity-10 pointer-events-none"
              style={{ backgroundImage: "radial-gradient(circle at 20% 30%, #FBBF24 1px, transparent 2px), radial-gradient(circle at 80% 70%, #10B981 1px, transparent 2px)", backgroundSize: "60px 60px" }} />
         <div className="relative">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
-              <Moon className="text-emerald-950" size={24} strokeWidth={2.5} />
-            </div>
+          <div className="flex items-center gap-4 mb-8">
+            <img src="/assets/logo.png" alt="Logo Ponpes As Shidiq" className="w-20 h-20 object-contain drop-shadow-xl" />
             <div>
               <div className="text-xs uppercase tracking-widest text-amber-300 font-semibold">Pondok Pesantren</div>
               <div className="text-xl font-bold">AS SHIDIQ</div>
@@ -56,9 +54,7 @@ export default function Login() {
       <div className="flex items-center justify-center p-6">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 border border-emerald-100">
           <div className="flex items-center gap-3 mb-8 lg:hidden">
-            <div className="w-10 h-10 rounded-xl bg-emerald-800 flex items-center justify-center">
-              <Moon className="text-amber-300" size={20} />
-            </div>
+            <img src="/assets/logo.png" alt="Logo Ponpes As Shidiq" className="w-12 h-12 object-contain" />
             <div className="font-bold text-emerald-900">AS SHIDIQ</div>
           </div>
           <div className="text-xs uppercase tracking-widest text-amber-600 font-semibold mb-2">Login Admin</div>

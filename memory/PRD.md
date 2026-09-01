@@ -28,6 +28,7 @@ Aplikasi web untuk Manajemen Data & Administrasi Santri Pondok Pesantren As Shid
 12. Data demo seeded.
 
 ## Implemented (2026-09-01)
+- Logo resmi Ponpes As Shidiq terpasang di: sidebar, halaman login, kwitansi PDF, favicon (file: /app/frontend/public/assets/logo.png, /app/backend/assets/logo.png, /app/frontend/public/favicon.png).
 - Emergent-managed Google OAuth (AuthCallback + session cookie, 7-day). Owner email auto super_admin; first user fallback.
 - Backend: all `/api` routes — auth, admins (super_admin-gated), master data CRUD, santri CRUD + detail, tagihan batch create (all/kelas/program/santri) + auto-lunas on payment, pembayaran + kwitansi PDF (reportlab), dashboard stats/charts, laporan, global search, aktivitas log, export xlsx + template, import xlsx (dedupe by nomor_induk).
 - Seed/bootstrap: 24 santri (12 putra/12 putri), invoices + payments, master data (5 programs, 9 kelas, 3 jurusan, 3 tahun ajaran, 8 jenis pembayaran, 4 asrama, 8 kamar), owner super_admin + test admin.
