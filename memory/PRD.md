@@ -40,6 +40,7 @@ Aplikasi web untuk Manajemen Data & Administrasi Santri Pondok Pesantren As Shid
 - Router/Auth subpath support: `BrowserRouter basename={process.env.PUBLIC_URL}` (App.js), redirect OAuth + replaceState pakai PUBLIC_URL (Login.jsx, AuthCallback.jsx). Preview Emergent tetap di root (PUBLIC_URL kosong).
 - Syarat user: repo Settings → Pages → Source = GitHub Actions; tambahkan Actions Variable `REACT_APP_BACKEND_URL=https://shidiq-admin-panel.preview.emergentagent.com`; push branch main.
 - Verifikasi lokal: build sukses (37s), semua asset di-serve benar di bawah /web-santri-as-shidiq/ (index, js, css, favicon, 404.html → 200). Backend tetap di Emergent (API dipanggil lintas origin, CORS sudah `*`).
+- Fix (2026-09-01): CI gagal karena `frontend/yarn.lock` untracked → di-commit (`git ls-files` verified). Testing agent iteration_2: semua 9 checks PASS (git tracking, workflow YAML, frozen-lockfile install, CI-parity build, asset prefix, preview regression).
 
 ## Backlog / Next Tasks
 - **P1**: Upload foto santri (object storage); per-filter export (CSV/PDF) on Santri page; Dokumen tab upload; idempotency guard on seed bootstrap.
