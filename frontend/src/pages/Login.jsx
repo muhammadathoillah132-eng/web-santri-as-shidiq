@@ -11,7 +11,7 @@ export default function Login() {
     return null;
   }
   const handleLogin = () => {
-    const redirectUrl = window.location.origin + "/";
+    const redirectUrl = window.location.origin + (process.env.PUBLIC_URL || "") + "/";
     window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
   };
 
