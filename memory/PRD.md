@@ -41,6 +41,7 @@ Aplikasi web untuk Manajemen Data & Administrasi Santri Pondok Pesantren As Shid
 - Syarat user: repo Settings → Pages → Source = GitHub Actions; tambahkan Actions Variable `REACT_APP_BACKEND_URL=https://shidiq-admin-panel.preview.emergentagent.com`; push branch main.
 - Verifikasi lokal: build sukses (37s), semua asset di-serve benar di bawah /web-santri-as-shidiq/ (index, js, css, favicon, 404.html → 200). Backend tetap di Emergent (API dipanggil lintas origin, CORS sudah `*`).
 - Fix (2026-09-01): CI gagal karena `frontend/yarn.lock` untracked → di-commit (`git ls-files` verified). Testing agent iteration_2: semua 9 checks PASS (git tracking, workflow YAML, frozen-lockfile install, CI-parity build, asset prefix, preview regression).
+- Fix login GitHub Pages (2026-09-02): CORS `*` + credentials ditolak browser & cookie jadi third-party dari github.io. Solusi: backend CORS explicit origins + `allow_origin_regex` github.io; frontend Bearer token via localStorage (interceptor di lib/api.js, withCredentials:false; AuthCallback menyimpan token; logout menerima Bearer). Testing agent iteration_3: 11/11 PASS (cross-origin Bearer flow, CORS preflight echo, origin rejection, logout Bearer, regresi preview). Trade-off tercatat: token di localStorage (XSS-exfiltrable) — diterima untuk deployment GH Pages.
 
 ## Backlog / Next Tasks
 - **P1**: Upload foto santri (object storage); per-filter export (CSV/PDF) on Santri page; Dokumen tab upload; idempotency guard on seed bootstrap.
