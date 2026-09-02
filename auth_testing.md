@@ -1,57 +1,50 @@
-# Emergent Auth Testing Playbook (AS SHIDIQ)
+# Auth Testing Playbook (AS SHIDIQ) — Username/Password Session Auth
 
-## Step 1: Create Test User & Session
+## Step 1: MongoDB Verification
 ```bash
-mongosh --eval "
+mongosh --quiet --eval "
 use('test_database');
-var userId = 'test-user-' + Date.now();
-var sessionToken = 'test_session_' + Date.now();
-db.users.insertOne({
-  user_id: userId,
-  email: 'akayfikanita@gmail.com',
-  name: 'Owner Test',
-  picture: 'https://via.placeholder.com/150',
-  role: 'super_admin',
-  status: 'active',
-  created_at: new Date()
-});
-db.user_sessions.insertOne({
-  user_id: userId,
-  session_token: sessionToken,
-  expires_at: new Date(Date.now() + 7*24*60*60*1000),
-  created_at: new Date()
-});
-print('Session token: ' + sessionToken);
-print('User ID: ' + userId);
+db.users.find({}, {username:1, email:1, role:1}).forEach(u => print(u.username, u.email, u.role));
+var sa = db.users.findOne({username: 'superadmin'}, {password_hash: 1});
+print('hash starts \$2b\$:', sa.password_hash.startsWith('\$2b\$'));
 "
 ```
 
-## Step 2: Test Backend
+## Step 2: API Login Flow (cookie jar)
 ```bash
 API=$(grep REACT_APP_BACKEND_URL /app/frontend/.env | cut -d '=' -f2)
-curl -s "$API/api/auth/me" -H "Authorization: Bearer $SESSION_TOKEN"
-curl -s "$API/api/dashboard/stats" -H "Authorization: Bearer $SESSION_TOKEN"
+curl -c /tmp/cookies.txt -X POST "$API/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"identifier":"superadmin","password":"Admin@123","remember_me":true}'
+cat /tmp/cookies.txt   # expect session_token cookie
+curl -b /tmp/cookies.txt "$API/api/auth/me"
 ```
 
-## Step 3: Browser Testing
-```python
-await page.context.add_cookies([{
-    "name": "session_token",
-    "value": SESSION_TOKEN,
-    "domain": "shidiq-admin-panel.preview.emergentagent.com",
-    "path": "/",
-    "httpOnly": True,
-    "secure": True,
-    "sameSite": "None"
-}])
-await page.goto("https://shidiq-admin-panel.preview.emergentagent.com/")
+## Step 3: Bearer flow (cross-origin / GitHub Pages style)
+```bash
+TOKEN=$(curl -s -X POST "$API/api/auth/login" -H "Content-Type: application/json" \
+  -d '{"identifier":"superadmin","password":"Admin@123"}' | python3 -c "import sys,json;print(json.load(sys.stdin)['session_token'])")
+curl -s "$API/api/auth/me" -H "Authorization: Bearer $TOKEN"
 ```
+
+## Step 4: Negative cases
+- wrong password → 401, and login_attempts count increments (5x → 429 lockout 15 min)
+- unknown user → 401
+- no credentials on protected route → 401
+- admin role on /api/admins → 403
+
+## Step 5: Reset password (super_admin)
+```bash
+curl -X POST "$API/api/admins/<user_id>/reset-password" -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" -d '{"password":"NewPass@123"}'
+# then login with new password works; old sessions of that user are deleted
+```
+
+## Step 6: Browser
+Login form at /login: data-testid login-username-input, login-password-input, login-remember-checkbox, login-submit-button. On success redirects to dashboard.
 
 ## Success Indicators
-- ✅ /api/auth/me returns user with role
-- ✅ Dashboard loads without redirect
-- ✅ CRUD Santri/Payment works
-
-## Failure Indicators
-- ❌ 401 on /api/auth/me
-- ❌ Redirect loop
+- ✅ bcrypt hash starts with $2b$
+- ✅ login returns user + session_token, cookie set
+- ✅ /api/auth/me works via cookie AND Bearer
+- ✅ lockout after 5 failed attempts

@@ -4,7 +4,8 @@ from fastapi.responses import StreamingResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
-import os, io, uuid, logging, requests, calendar
+import os, io, uuid, logging, calendar
+import bcrypt
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional, Any
@@ -91,54 +92,58 @@ def require_super_admin(user: dict) -> dict:
 
 
 # =============== AUTH ===============
-@api.post("/auth/session")
-async def create_session(request: Request, response: Response):
-    body = await request.json()
-    session_id = body.get("session_id")
-    if not session_id:
-        raise HTTPException(400, "session_id required")
-    r = requests.get(
-        "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
-        headers={"X-Session-ID": session_id}, timeout=10,
-    )
-    if r.status_code != 200:
-        raise HTTPException(401, "Invalid session_id")
-    data = r.json()
-    email = data["email"].lower()
-    existing = await db.users.find_one({"email": email}, {"_id": 0})
-    if existing:
-        user_id = existing["user_id"]
-        role = existing.get("role")
-        # Ensure owner always has super_admin
-        if email == OWNER_EMAIL and role != "super_admin":
-            await db.users.update_one({"user_id": user_id}, {"$set": {"role": "super_admin"}})
-            role = "super_admin"
-        await db.users.update_one({"user_id": user_id}, {"$set": {
-            "name": data["name"], "picture": data["picture"],
-            "last_login": iso(now_utc()), "status": existing.get("status", "active"),
-        }})
-    else:
-        user_id = new_id("user")
-        # First user or owner email → super_admin
-        count = await db.users.count_documents({})
-        role = "super_admin" if (count == 0 or email == OWNER_EMAIL) else "admin"
-        await db.users.insert_one({
-            "user_id": user_id, "email": email, "name": data["name"],
-            "picture": data["picture"], "role": role, "status": "active",
-            "whatsapp": "", "username": email.split("@")[0],
-            "created_at": iso(now_utc()), "last_login": iso(now_utc()),
-        })
-    session_token = data["session_token"]
+def hash_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+
+def verify_password(plain: str, hashed: str) -> bool:
+    try:
+        return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
+    except Exception:
+        return False
+
+
+class LoginIn(BaseModel):
+    identifier: str  # username atau email
+    password: str
+    remember_me: bool = False
+
+
+@api.post("/auth/login")
+async def login(payload: LoginIn, response: Response):
+    ident = payload.identifier.strip().lower()
+    user = await db.users.find_one({"$or": [{"email": ident}, {"username": ident}]}, {"_id": 0})
+    invalid = HTTPException(401, "Username/email atau password salah")
+    if not user or not user.get("password_hash"):
+        raise invalid
+    la = await db.login_attempts.find_one({"identifier": ident})
+    if la and la.get("count", 0) >= 5 and la.get("locked_until", "") > iso(now_utc()):
+        raise HTTPException(429, "Terlalu banyak percobaan login. Coba lagi 15 menit lagi.")
+    if not verify_password(payload.password, user["password_hash"]):
+        await db.login_attempts.update_one(
+            {"identifier": ident},
+            {"$inc": {"count": 1},
+             "$set": {"locked_until": iso(now_utc() + timedelta(minutes=15)), "last_attempt": iso(now_utc())}},
+            upsert=True,
+        )
+        raise invalid
+    if user.get("status") == "inactive":
+        raise HTTPException(403, "Akun dinonaktifkan. Hubungi Super Admin.")
+    await db.login_attempts.delete_one({"identifier": ident})
+    days = 30 if payload.remember_me else 1
+    session_token = f"sess_{uuid.uuid4().hex}"
     await db.user_sessions.insert_one({
-        "user_id": user_id, "session_token": session_token,
-        "expires_at": iso(now_utc() + timedelta(days=7)),
+        "user_id": user["user_id"], "session_token": session_token,
+        "expires_at": iso(now_utc() + timedelta(days=days)),
         "created_at": iso(now_utc()),
     })
     response.set_cookie(
         key="session_token", value=session_token,
-        max_age=7 * 24 * 3600, httponly=True, secure=True, samesite="none", path="/",
+        max_age=days * 24 * 3600, httponly=True, secure=True, samesite="none", path="/",
     )
-    user = await db.users.find_one({"user_id": user_id}, {"_id": 0})
+    await db.users.update_one({"user_id": user["user_id"]}, {"$set": {"last_login": iso(now_utc())}})
+    await log_activity(user, "login", "auth", f"{user.get('email')} login")
+    user.pop("password_hash", None)
     return {"user": user, "session_token": session_token}
 
 
@@ -156,7 +161,7 @@ async def logout(request: Request, response: Response):
             token = auth[7:]
     if token:
         await db.user_sessions.delete_one({"session_token": token})
-    response.delete_cookie("session_token", path="/")
+    response.delete_cookie("session_token", path="/", secure=True, samesite="none")
     return {"ok": True}
 
 
@@ -170,6 +175,8 @@ async def list_admins(user=Depends(get_current_user)):
 class AdminIn(BaseModel):
     name: str
     email: str
+    username: Optional[str] = None
+    password: Optional[str] = None
     whatsapp: Optional[str] = ""
     role: str = "admin"
     status: str = "active"
@@ -181,17 +188,39 @@ async def add_admin(payload: AdminIn, user=Depends(get_current_user)):
     email = payload.email.lower()
     if await db.users.find_one({"email": email}):
         raise HTTPException(400, "Email already exists")
+    if not payload.password or len(payload.password) < 6:
+        raise HTTPException(400, "Password wajib diisi (minimal 6 karakter)")
+    username = (payload.username or email.split("@")[0]).strip().lower()
+    if await db.users.find_one({"username": username}):
+        raise HTTPException(400, "Username sudah dipakai")
     uid = new_id("user")
     doc = {
         "user_id": uid, "email": email, "name": payload.name,
+        "username": username, "password_hash": hash_password(payload.password),
         "whatsapp": payload.whatsapp, "role": payload.role,
-        "status": payload.status, "username": email.split("@")[0],
+        "status": payload.status,
         "picture": "", "created_at": iso(now_utc()), "last_login": None,
     }
     await db.users.insert_one(doc)
     await log_activity(user, "create_admin", "admin", f"Added admin {email}")
     doc.pop("_id", None)
+    doc.pop("password_hash", None)
     return doc
+
+
+@api.post("/admins/{user_id}/reset-password")
+async def reset_admin_password(user_id: str, payload: dict, user=Depends(get_current_user)):
+    require_super_admin(user)
+    new_pw = (payload.get("password") or "").strip()
+    if len(new_pw) < 6:
+        raise HTTPException(400, "Password minimal 6 karakter")
+    target = await db.users.find_one({"user_id": user_id}, {"_id": 0})
+    if not target:
+        raise HTTPException(404, "Not found")
+    await db.users.update_one({"user_id": user_id}, {"$set": {"password_hash": hash_password(new_pw)}})
+    await db.user_sessions.delete_many({"user_id": user_id})
+    await log_activity(user, "reset_password", "admin", f"Reset password {target.get('email')}")
+    return {"ok": True}
 
 
 @api.patch("/admins/{user_id}")
@@ -760,6 +789,7 @@ async def startup():
     await db.santri.create_index("nomor_induk")
     await db.users.create_index("email", unique=True)
     await db.user_sessions.create_index("session_token", unique=True)
+    await db.login_attempts.create_index("identifier")
     # Bootstrap master data + demo if empty
     from seed_data import bootstrap
     await bootstrap(db, OWNER_EMAIL)

@@ -43,6 +43,12 @@ Aplikasi web untuk Manajemen Data & Administrasi Santri Pondok Pesantren As Shid
 - Fix (2026-09-01): CI gagal karena `frontend/yarn.lock` untracked → di-commit (`git ls-files` verified). Testing agent iteration_2: semua 9 checks PASS (git tracking, workflow YAML, frozen-lockfile install, CI-parity build, asset prefix, preview regression).
 - Fix login GitHub Pages (2026-09-02): CORS `*` + credentials ditolak browser & cookie jadi third-party dari github.io. Solusi: backend CORS explicit origins + `allow_origin_regex` github.io; frontend Bearer token via localStorage (interceptor di lib/api.js, withCredentials:false; AuthCallback menyimpan token; logout menerima Bearer). Testing agent iteration_3: 11/11 PASS (cross-origin Bearer flow, CORS preflight echo, origin rejection, logout Bearer, regresi preview). Trade-off tercatat: token di localStorage (XSS-exfiltrable) — diterima untuk deployment GH Pages.
 
+## Auth Migration (2026-09-02) — Username/Password menggantikan Google OAuth
+- POST /api/auth/login {identifier (username/email), password, remember_me} → session_token (cookie + Bearer); remember_me 30 hari vs 1 hari; bcrypt hash ($2b$); lockout 5x gagal → 429 15 menit (login_attempts).
+- POST /api/admins kini wajib password (min 6) + username opsional; POST /api/admins/{id}/reset-password (super_admin, mengakhiri sesi admin tsb). Tidak ada registrasi publik — admin dibuat Super Admin.
+- Seed: superadmin/Admin@123 (owner akayfikanita@gmail.com), admintest/Test@123 (role admin). Endpoint Google /api/auth/session DIHAPUS; AuthCallback route dihapus; Login.jsx form username/password + Remember Me; ManajemenAdmin: field password + tombol reset.
+- Testing agent iteration_4: 18/18 backend PASS, frontend 100% (form login, error message, reset flow, RBAC). Kredensial: /app/memory/test_credentials.md.
+
 ## Backlog / Next Tasks
 - **P1**: Upload foto santri (object storage); per-filter export (CSV/PDF) on Santri page; Dokumen tab upload; idempotency guard on seed bootstrap.
 - **P1**: Reset-password / admin credential flows if non-OAuth admins added later.

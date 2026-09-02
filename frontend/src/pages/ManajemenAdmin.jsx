@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, Edit3, ShieldCheck } from "lucide-react";
+import { Plus, Trash2, Edit3, ShieldCheck, KeyRound } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 
@@ -17,6 +17,8 @@ export default function ManajemenAdmin() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ role: "admin", status: "active" });
+  const [resetTarget, setResetTarget] = useState(null);
+  const [resetPw, setResetPw] = useState("");
 
   const load = async () => setList((await api.get("/admins")).data);
   useEffect(() => { load(); }, []);
@@ -26,11 +28,21 @@ export default function ManajemenAdmin() {
 
   const save = async () => {
     if (!form.name || !form.email) return toast.error("Nama & email wajib");
+    if (!editing && (!form.password || form.password.length < 6)) return toast.error("Password awal minimal 6 karakter");
     try {
       if (editing) await api.patch(`/admins/${editing.user_id}`, form);
       else await api.post("/admins", form);
       toast.success("Tersimpan"); setOpen(false); load();
     } catch (e) { toast.error(e?.response?.data?.detail || "Gagal"); }
+  };
+
+  const doReset = async () => {
+    if (!resetPw || resetPw.length < 6) return toast.error("Password minimal 6 karakter");
+    try {
+      await api.post(`/admins/${resetTarget.user_id}/reset-password`, { password: resetPw });
+      toast.success(`Password ${resetTarget.name} berhasil direset`);
+      setResetTarget(null); setResetPw("");
+    } catch (e) { toast.error(e?.response?.data?.detail || "Gagal reset"); }
   };
 
   const del = async (a) => {
@@ -62,6 +74,7 @@ export default function ManajemenAdmin() {
                 <td className="p-3 text-xs">{a.last_login ? fmtDate(a.last_login) : "-"}</td>
                 <td className="p-3 text-right">
                   <Button size="icon" variant="ghost" onClick={() => openEdit(a)} data-testid={`admin-edit-${i}`}><Edit3 size={14} /></Button>
+                  <Button size="icon" variant="ghost" onClick={() => { setResetTarget(a); setResetPw(""); }} className="text-amber-600" title="Reset Password" data-testid={`admin-reset-${i}`}><KeyRound size={14} /></Button>
                   <Button size="icon" variant="ghost" onClick={() => del(a)} className="text-rose-600" data-testid={`admin-del-${i}`}><Trash2 size={14} /></Button>
                 </td>
               </tr>
@@ -75,7 +88,13 @@ export default function ManajemenAdmin() {
           <DialogHeader><DialogTitle>{editing ? "Edit Admin" : "Tambah Admin"}</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1"><Label className="text-xs">Nama</Label><Input value={form.name || ""} onChange={(e) => setForm({ ...form, name: e.target.value })} data-testid="admin-name" /></div>
-            <div className="space-y-1"><Label className="text-xs">Email (harus akun Google)</Label><Input value={form.email || ""} onChange={(e) => setForm({ ...form, email: e.target.value })} disabled={!!editing} data-testid="admin-email" /></div>
+            <div className="space-y-1"><Label className="text-xs">Email</Label><Input value={form.email || ""} onChange={(e) => setForm({ ...form, email: e.target.value })} disabled={!!editing} data-testid="admin-email" /></div>
+            {!editing && (
+              <>
+                <div className="space-y-1"><Label className="text-xs">Username (opsional)</Label><Input value={form.username || ""} onChange={(e) => setForm({ ...form, username: e.target.value })} placeholder="Default: dari email" data-testid="admin-username" /></div>
+                <div className="space-y-1"><Label className="text-xs">Password Awal *</Label><Input type="password" value={form.password || ""} onChange={(e) => setForm({ ...form, password: e.target.value })} data-testid="admin-password" /></div>
+              </>
+            )}
             <div className="space-y-1"><Label className="text-xs">WhatsApp</Label><Input value={form.whatsapp || ""} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} data-testid="admin-wa" /></div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1"><Label className="text-xs">Role</Label>
@@ -93,6 +112,17 @@ export default function ManajemenAdmin() {
             </div>
           </div>
           <DialogFooter><Button variant="outline" onClick={() => setOpen(false)}>Batal</Button><Button onClick={save} className="bg-emerald-700 hover:bg-emerald-800" data-testid="admin-save">Simpan</Button></DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!resetTarget} onOpenChange={(o) => { if (!o) setResetTarget(null); }}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Reset Password — {resetTarget?.name}</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-slate-500">Password baru akan langsung aktif dan seluruh sesi login admin ini akan diakhiri.</p>
+            <div className="space-y-1"><Label className="text-xs">Password Baru *</Label><Input type="password" value={resetPw} onChange={(e) => setResetPw(e.target.value)} data-testid="reset-password-input" /></div>
+          </div>
+          <DialogFooter><Button variant="outline" onClick={() => setResetTarget(null)}>Batal</Button><Button onClick={doReset} className="bg-amber-600 hover:bg-amber-700" data-testid="reset-password-submit">Reset Password</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

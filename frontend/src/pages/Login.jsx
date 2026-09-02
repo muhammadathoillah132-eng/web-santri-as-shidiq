@@ -1,18 +1,44 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { Moon, Star, ShieldCheck } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Star, ShieldCheck, Eye, EyeOff, LogIn } from "lucide-react";
 
-// REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
 export default function Login() {
-  const { user, loading } = useAuth();
+  const { user, loading, setUser } = useAuth();
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ identifier: "", password: "", remember_me: false });
+  const [showPw, setShowPw] = useState(false);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+
   if (!loading && user) {
     window.location.href = "/";
     return null;
   }
-  const handleLogin = () => {
-    const redirectUrl = window.location.origin + (process.env.PUBLIC_URL || "") + "/";
-    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!form.identifier.trim() || !form.password) {
+      setError("Username dan password wajib diisi");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    try {
+      const { data } = await api.post("/auth/login", form);
+      localStorage.setItem("session_token", data.session_token);
+      setUser(data.user);
+      navigate("/", { replace: true });
+    } catch (err) {
+      const d = err?.response?.data?.detail;
+      setError(typeof d === "string" ? d : "Login gagal. Periksa kembali username & password.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -44,7 +70,7 @@ export default function Login() {
           </div>
           <div className="flex items-center gap-3 text-emerald-100/90 text-sm">
             <Star size={18} className="text-amber-300" />
-            Login satu klik dengan akun Google
+            Password terenkripsi & proteksi brute-force
           </div>
           <div className="islamic-divider mt-6 opacity-50" />
         </div>
@@ -61,24 +87,74 @@ export default function Login() {
           <h2 className="text-2xl font-bold text-emerald-950 mb-2">Selamat Datang Kembali</h2>
           <p className="text-slate-500 text-sm mb-8">Masuk untuk melanjutkan mengelola data santri & administrasi pondok.</p>
 
-          <Button
-            data-testid="google-login-button"
-            onClick={handleLogin}
-            className="w-full h-12 bg-white hover:bg-emerald-50 text-slate-800 border border-slate-300 shadow-sm font-medium"
-          >
-            <svg className="mr-2" width="18" height="18" viewBox="0 0 48 48">
-              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-            </svg>
-            Lanjutkan dengan Google
-          </Button>
+          <form onSubmit={submit} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="login-identifier" className="text-xs font-semibold text-emerald-900">Username / Email</Label>
+              <Input
+                id="login-identifier"
+                data-testid="login-username-input"
+                autoComplete="username"
+                placeholder="Masukkan username atau email"
+                value={form.identifier}
+                onChange={(e) => setForm({ ...form, identifier: e.target.value })}
+                className="h-11"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="login-password" className="text-xs font-semibold text-emerald-900">Password</Label>
+              <div className="relative">
+                <Input
+                  id="login-password"
+                  data-testid="login-password-input"
+                  type={showPw ? "text" : "password"}
+                  autoComplete="current-password"
+                  placeholder="Masukkan password"
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  className="h-11 pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPw(!showPw)}
+                  data-testid="login-toggle-password"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-700"
+                >
+                  {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                data-testid="login-remember-checkbox"
+                checked={form.remember_me}
+                onChange={(e) => setForm({ ...form, remember_me: e.target.checked })}
+                className="w-4 h-4 rounded border-slate-300 text-emerald-700 focus:ring-emerald-600 accent-emerald-700"
+              />
+              <span className="text-sm text-slate-600">Ingat saya (30 hari)</span>
+            </label>
+
+            {error && (
+              <div data-testid="login-error" className="text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">
+                {error}
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              disabled={busy}
+              data-testid="login-submit-button"
+              className="w-full h-12 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold"
+            >
+              <LogIn size={18} className="mr-2" />
+              {busy ? "Memproses…" : "Masuk"}
+            </Button>
+          </form>
 
           <div className="mt-6 p-4 rounded-xl bg-amber-50 border border-amber-200">
             <div className="text-xs font-semibold text-amber-700 uppercase tracking-wider mb-1">Info</div>
             <div className="text-sm text-slate-700">
-              Login pertama akan memberikan akses <b>Super Admin</b> otomatis kepada pemilik akun. Admin tambahan dapat diundang melalui menu <b>Manajemen Admin</b>.
+              Akun admin dibuat oleh <b>Super Admin</b> melalui menu <b>Manajemen Admin</b>. Lupa password? Minta Super Admin untuk me-reset password Anda.
             </div>
           </div>
 

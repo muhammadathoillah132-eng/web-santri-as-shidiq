@@ -1,9 +1,8 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { Toaster } from "sonner";
 import Login from "@/pages/Login";
-import AuthCallback from "@/pages/AuthCallback";
 import Layout from "@/pages/Layout";
 import Dashboard from "@/pages/Dashboard";
 import Santri from "@/pages/Santri";
@@ -25,9 +24,6 @@ function Protected({ children, requireSuper }) {
 }
 
 function AppRouter() {
-  const location = useLocation();
-  // Detect OAuth callback in URL hash before any protected route runs
-  if (location.hash?.includes("session_id=")) return <AuthCallback />;
   return (
     <Routes>
       <Route path="/login" element={<Login />} />

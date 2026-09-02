@@ -1,6 +1,11 @@
 """Seed / bootstrap data for AS SHIDIQ SANTRI MANAGEMENT."""
-import uuid, random
+import uuid, random, os
+import bcrypt
 from datetime import datetime, timezone, timedelta
+
+
+def hash_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 
 def iso(dt): 
@@ -66,22 +71,38 @@ async def bootstrap(db, owner_email):
         for k in KAMARS:
             await db.m_kamars.insert_one({"id": nid("m"), "name": k, "created_at": iso(now())})
 
-    # Ensure owner exists as super_admin
-    if not await db.users.find_one({"email": owner_email}):
+    # Ensure owner exists as super_admin with username/password credentials
+    admin_pw = os.environ.get("ADMIN_PASSWORD", "Admin@123")
+    owner = await db.users.find_one({"email": owner_email})
+    if not owner:
         await db.users.insert_one({
-            "user_id": nid("user"), "email": owner_email, "name": "Owner (Super Admin)",
+            "user_id": nid("user"), "email": owner_email, "name": "Super Admin",
             "role": "super_admin", "status": "active", "picture": "",
-            "whatsapp": "", "username": owner_email.split("@")[0],
+            "whatsapp": "", "username": "superadmin",
+            "password_hash": hash_password(admin_pw),
             "created_at": iso(now()), "last_login": None,
         })
+    else:
+        updates = {}
+        if owner.get("username") != "superadmin":
+            updates["username"] = "superadmin"
+        if not owner.get("password_hash"):
+            updates["password_hash"] = hash_password(admin_pw)
+        if updates:
+            await db.users.update_one({"email": owner_email}, {"$set": updates})
     # Test admin
-    if not await db.users.find_one({"email": "admin.test@as-shidiq.sch.id"}):
+    tadm = await db.users.find_one({"email": "admin.test@as-shidiq.sch.id"})
+    if not tadm:
         await db.users.insert_one({
             "user_id": nid("user"), "email": "admin.test@as-shidiq.sch.id",
             "name": "Admin Uji", "role": "admin", "status": "active", "picture": "",
             "whatsapp": "081234567890", "username": "admintest",
+            "password_hash": hash_password("Test@123"),
             "created_at": iso(now()), "last_login": None,
         })
+    elif not tadm.get("password_hash"):
+        await db.users.update_one({"email": "admin.test@as-shidiq.sch.id"},
+                                  {"$set": {"username": "admintest", "password_hash": hash_password("Test@123")}})
 
     # Demo santri if empty
     if await db.santri.count_documents({}) == 0:
