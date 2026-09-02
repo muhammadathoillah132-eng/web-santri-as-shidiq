@@ -16,9 +16,9 @@ export default function Login() {
   const [busy, setBusy] = useState(false);
 
   if (!loading && user) {
-    window.location.href = "/";
+    navigate("/", { replace: true });
     return null;
-  }
+}
 
   const submit = async (e) => {
     e.preventDefault();
