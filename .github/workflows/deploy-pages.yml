@@ -39,7 +39,7 @@ jobs:
 
       - name: Build frontend
         env:
-          PUBLIC_URL: /web-santri-as-shidiq
+          PUBLIC_URL: /
           REACT_APP_BACKEND_URL: ${{ vars.REACT_APP_BACKEND_URL }}
           CI: false
           DISABLE_ESLINT_PLUGIN: true
