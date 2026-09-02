@@ -66,6 +66,7 @@ Aplikasi web untuk Manajemen Data & Administrasi Santri Pondok Pesantren As Shid
 - `backend/runtime.txt`: python-3.11.16.
 - CORS_ORIGINS di Render: santriasshidiq.my.id (+www); github.io sudah dicover regex.
 - TODO setelah Render live: user kirim URL → set GitHub Actions var REACT_APP_BACKEND_URL → workflow PUBLIC_URL dihapus utk custom domain → DNS CNAME santriasshidiq.my.id → CNAME file di frontend/public → Atlas allowlist 0.0.0.0/0 (Render IP dinamis).
+- Render meminta kartu kredit untuk akun user ini → fallback disiapkan: `backend/api/index.py` + `backend/vercel.json` (Vercel serverless adapter, root directory = backend). Koyeb = opsi coba-dulu (free tier terbatas Frankfurt/Washington, mungkin minta kartu saat verifikasi).
 
 ## Backlog / Next Tasks
 - **P1**: Upload foto santri (object storage); per-filter export (CSV/PDF) on Santri page; Dokumen tab upload; idempotency guard on seed bootstrap.
