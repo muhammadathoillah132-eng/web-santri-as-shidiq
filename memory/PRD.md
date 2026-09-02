@@ -68,6 +68,11 @@ Aplikasi web untuk Manajemen Data & Administrasi Santri Pondok Pesantren As Shid
 - TODO setelah Render live: user kirim URL → set GitHub Actions var REACT_APP_BACKEND_URL → workflow PUBLIC_URL dihapus utk custom domain → DNS CNAME santriasshidiq.my.id → CNAME file di frontend/public → Atlas allowlist 0.0.0.0/0 (Render IP dinamis).
 - Render meminta kartu kredit untuk akun user ini → fallback disiapkan: `backend/api/index.py` + `backend/vercel.json` (Vercel serverless adapter, root directory = backend). Koyeb = opsi coba-dulu (free tier terbatas Frankfurt/Washington, mungkin minta kartu saat verifikasi).
 
+## Vercel Deploy (2026-09-02)
+- Koyeb dicoba, hasil akhir: **Vercel**. Struktur final: `backend/index.py` (root, `from server import app`) — Vercel framework auto-detect FastAPI. `api/` + `vercel.json` DIHAPUS (konflik routing).
+- Masalah yang ditemukan: (1) preview URL dilindungi Deployment Protection (302 → vercel.com/sso-api) — harus dimatikan di Settings → Deployment Protection, atau pakai production URL; (2) 404 karena file adapter belum ter-push / root directory belum `backend`.
+- Project URL: https://web-santri-as-shidiq.vercel.app (Root Directory = backend).
+
 ## Backlog / Next Tasks
 - **P1**: Upload foto santri (object storage); per-filter export (CSV/PDF) on Santri page; Dokumen tab upload; idempotency guard on seed bootstrap.
 - **P1**: Reset-password / admin credential flows if non-OAuth admins added later.
