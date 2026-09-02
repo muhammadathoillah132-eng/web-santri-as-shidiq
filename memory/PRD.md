@@ -61,6 +61,12 @@ Aplikasi web untuk Manajemen Data & Administrasi Santri Pondok Pesantren As Shid
 - Atlas Network Access: IP pod Emergent `34.170.12.145/32` diizinkan user. TODO setelah migrasi: tambah IP Render/host backend baru & persempit.
 - BELUM: backend masih memakai MongoDB Emergent (MONGO_URL belum diubah — menunggu persetujuan user untuk tahap backend migration).
 
+## Render Deployment Prep (2026-09-02)
+- `render.yaml` (repo root): web service `asshidiq-api`, rootDir backend, plan free, build `pip install -r requirements.txt`, start `uvicorn server:app --host 0.0.0.0 --port $PORT`, healthCheck `/api/`, PYTHON_VERSION 3.11.16. Env sync:false = MONGO_URL & ADMIN_PASSWORD (user isi di dashboard Render).
+- `backend/runtime.txt`: python-3.11.16.
+- CORS_ORIGINS di Render: santriasshidiq.my.id (+www); github.io sudah dicover regex.
+- TODO setelah Render live: user kirim URL → set GitHub Actions var REACT_APP_BACKEND_URL → workflow PUBLIC_URL dihapus utk custom domain → DNS CNAME santriasshidiq.my.id → CNAME file di frontend/public → Atlas allowlist 0.0.0.0/0 (Render IP dinamis).
+
 ## Backlog / Next Tasks
 - **P1**: Upload foto santri (object storage); per-filter export (CSV/PDF) on Santri page; Dokumen tab upload; idempotency guard on seed bootstrap.
 - **P1**: Reset-password / admin credential flows if non-OAuth admins added later.
