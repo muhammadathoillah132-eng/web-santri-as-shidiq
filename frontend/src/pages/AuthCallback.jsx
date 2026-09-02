@@ -20,6 +20,7 @@ export default function AuthCallback() {
     (async () => {
       try {
         const { data } = await api.post("/auth/session", { session_id });
+        localStorage.setItem("session_token", data.session_token);
         setUser(data.user);
         window.history.replaceState(null, "", (process.env.PUBLIC_URL || "") + "/");
         navigate("/", { replace: true, state: { user: data.user } });

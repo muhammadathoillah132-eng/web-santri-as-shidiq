@@ -5,7 +5,15 @@ export const API = `${BACKEND_URL}/api`;
 
 export const api = axios.create({
   baseURL: API,
-  withCredentials: true,
+  // false: auth cross-origin (GitHub Pages) memakai Bearer header dari localStorage;
+  // same-origin (preview Emergent) tetap mengirim cookie secara default.
+  withCredentials: false,
+});
+
+api.interceptors.request.use((config) => {
+  const t = localStorage.getItem("session_token");
+  if (t) config.headers.Authorization = `Bearer ${t}`;
+  return config;
 });
 
 export const fmtIDR = (n) =>

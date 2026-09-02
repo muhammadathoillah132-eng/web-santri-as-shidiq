@@ -150,6 +150,10 @@ async def auth_me(user: dict = Depends(get_current_user)):
 @api.post("/auth/logout")
 async def logout(request: Request, response: Response):
     token = request.cookies.get("session_token")
+    if not token:
+        auth = request.headers.get("Authorization", "")
+        if auth.startswith("Bearer "):
+            token = auth[7:]
     if token:
         await db.user_sessions.delete_one({"session_token": token})
     response.delete_cookie("session_token", path="/")
@@ -739,7 +743,8 @@ app.include_router(api)
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=[o for o in os.environ.get('CORS_ORIGINS', '').split(',') if o and o != '*'],
+    allow_origin_regex=r"https://.*\.github\.io",
     allow_methods=["*"], allow_headers=["*"],
 )
 
