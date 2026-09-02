@@ -49,6 +49,11 @@ Aplikasi web untuk Manajemen Data & Administrasi Santri Pondok Pesantren As Shid
 - Seed: superadmin/Admin@123 (owner akayfikanita@gmail.com), admintest/Test@123 (role admin). Endpoint Google /api/auth/session DIHAPUS; AuthCallback route dihapus; Login.jsx form username/password + Remember Me; ManajemenAdmin: field password + tombol reset.
 - Testing agent iteration_4: 18/18 backend PASS, frontend 100% (form login, error message, reset flow, RBAC). Kredensial: /app/memory/test_credentials.md.
 
+## Database Backup (2026-09-02)
+- File: `/app/backups/asshidiq_test_database_20260902_020359.archive.gz` (14K, gzip) + `.sha256` checksum + `LATEST.txt` pointer.
+- Isi: 14 collection, 212 dokumen (identik dengan live DB saat backup). Diverifikasi via directory-dump + bsondump count.
+- Restore nanti: `mongorestore --uri=<ATLAS_URI> --archive=<file> --gzip` (hanya setelah persetujuan user).
+
 ## Backlog / Next Tasks
 - **P1**: Upload foto santri (object storage); per-filter export (CSV/PDF) on Santri page; Dokumen tab upload; idempotency guard on seed bootstrap.
 - **P1**: Reset-password / admin credential flows if non-OAuth admins added later.
