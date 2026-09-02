@@ -54,6 +54,13 @@ Aplikasi web untuk Manajemen Data & Administrasi Santri Pondok Pesantren As Shid
 - Isi: 14 collection, 212 dokumen (identik dengan live DB saat backup). Diverifikasi via directory-dump + bsondump count.
 - Restore nanti: `mongorestore --uri=<ATLAS_URI> --archive=<file> --gzip` (hanya setelah persetujuan user).
 
+## MongoDB Atlas Restore (2026-09-02) ✅
+- Cluster: Atlas M0 `cluster0.7ea9azf.mongodb.net` (database `test_database`). URI disimpan di `/root/.atlas_uri` (chmod 600).
+- Restore dari archive: **212/212 dokumen, 0 gagal**, 14 collection, index ikut ter-restore (santri 3, users 2, user_sessions 2, login_attempts 2, lainnya 1).
+- Verifikasi Atlas = cocok 100% dengan backup. DB Emergent tetap utuh (14 collection, 212 dokumen, tidak tersentuh).
+- Atlas Network Access: IP pod Emergent `34.170.12.145/32` diizinkan user. TODO setelah migrasi: tambah IP Render/host backend baru & persempit.
+- BELUM: backend masih memakai MongoDB Emergent (MONGO_URL belum diubah — menunggu persetujuan user untuk tahap backend migration).
+
 ## Backlog / Next Tasks
 - **P1**: Upload foto santri (object storage); per-filter export (CSV/PDF) on Santri page; Dokumen tab upload; idempotency guard on seed bootstrap.
 - **P1**: Reset-password / admin credential flows if non-OAuth admins added later.
